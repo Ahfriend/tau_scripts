@@ -43,14 +43,19 @@ def process_and_collect(slab_name, slab_path, all_data):
         print(f"Error processing {file_path}: {e}")
 
 
-def plot_all_step_graphs(all_data, slab_colors,output_name):
+reaction_steps = ['Initial', 'OH', 'O', 'OOH', 'O2']
+
+def plot_all_step_graphs(all_data, slab_colors, output_name):
     """
     Plots all step graphs on a single plot, using the same style as the previous cell.
+    For each series, finds the highest delta between the right step and the left step
+    and writes it on the diagonal line between the relevant steps.
 
     Parameters:
         all_data (dict): Dictionary containing step graph data for all slabs.
+        slab_colors (dict): Dictionary mapping slab names to colors.
+        output_name (str): Name of the output file to save the plot.
     """
-    reaction_steps = ['Initial', 'OH', 'O', 'OOH', 'O2']
     plt.figure(figsize=(8, 5))
     step_positions = range(len(reaction_steps))
     step_width = 0.5
@@ -60,15 +65,39 @@ def plot_all_step_graphs(all_data, slab_colors,output_name):
     for idx, (slab_name, lowest_values) in enumerate(all_data.items()):
         y = np.array(lowest_values, dtype=float)
         x = np.array(step_positions, dtype=float)
-        x_left = x - shrink/2
-        x_right = x + shrink/2
+        x_left = x - shrink / 2
+        x_right = x + shrink / 2
         color = slab_colors.get(slab_name, plt.cm.tab10(idx))  # Default to tab10 if no color is specified
 
+        # Find the highest positive delta and annotate it
+        max_delta = 0
+        max_delta_index = -1
+        for i in range(len(x) - 1):
+            delta = y[i + 1] - y[i]
+            if delta > max_delta:
+                max_delta = delta
+                max_delta_index = i
 
-        for i in range(len(x)-1):
+            # Plot horizontal and diagonal lines
             plt.plot([x_left[i], x_right[i]], [y[i], y[i]], color=color, linewidth=2)
-            plt.plot([x_right[i], x_left[i+1]], [y[i], y[i+1]], color=color, linestyle='--', linewidth=1)
+            plt.plot([x_right[i], x_left[i + 1]], [y[i], y[i + 1]], color=color, linestyle='--', linewidth=1)
         plt.plot([x_left[-1], x_right[-1]], [y[-1], y[-1]], color=color, linewidth=2)
+
+        # Annotate all horizontal lines (step values) without a frame
+        for i in range(len(x)):
+            mid_x_h = (x_left[i] + x_right[i]) / 2
+            plt.text(
+            mid_x_h, y[i], f"{y[i]:.2f}", color=color, fontsize=10, ha='center', va='bottom'
+            )
+
+        # Annotate the highest positive delta on the diagonal line with background
+        if max_delta_index != -1 and max_delta > 0:
+            mid_x = (x_right[max_delta_index] + x_left[max_delta_index + 1]) / 2
+            mid_y = (y[max_delta_index] + y[max_delta_index + 1]) / 2
+            plt.text(
+            mid_x, mid_y, f"{max_delta:.2f}", color='black', fontsize=10, ha='center', va='center',
+            bbox=dict(facecolor='white', edgecolor=color, boxstyle='round,pad=0.2', alpha=0.8)
+            )
 
         handles.append(plt.Line2D([0], [0], color=color, lw=2, label=slab_name))
 
@@ -77,10 +106,11 @@ def plot_all_step_graphs(all_data, slab_colors,output_name):
     plt.ylabel('delta_G [eV]')
     plt.title('Step Graphs for All Slabs')
     plt.legend(handles=handles)
-    plt.xlim(-step_width, len(reaction_steps)-1+step_width)
+    plt.xlim(-step_width, len(reaction_steps) - 1 + step_width)
     plt.tight_layout()
     plt.savefig(f"{output_name}.png", dpi=300)
     plt.show()
+
 
 
 
