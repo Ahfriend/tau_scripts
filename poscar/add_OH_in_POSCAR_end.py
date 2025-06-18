@@ -42,11 +42,11 @@ def add_atoms_to_poscar(source_poscar, target_poscar, atom_index=None):
     print (f"o_atom_end_index: {o_atom_end_index}")
 
     # Insert the new O atom at the end of the O atoms
-    new_oxygen_line = f"{x:.6f} {y:.6f} {z + 0.05:.6f} T   T   T\n"
+    new_oxygen_line = f"{x:.6f} {y:.6f} {z + 0.038:.6f} T   T   T\n"
     atom_coordinates.insert(o_atom_end_index, new_oxygen_line)
 
     # Add the new H atom
-    new_hydrogen_line = f"{x:.6f} {y:.6f} {z + 0.09999999993:.6f} T   T   T\n"
+    new_hydrogen_line = f"{x:.6f} {y:.6f} {z + 0.07:.6f} T   T   T\n"
     atom_coordinates.append(new_hydrogen_line)
 
     # Update the atom count

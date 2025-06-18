@@ -60,7 +60,7 @@ def update_poscar_with_hydrogen():
         x, y, z = map(float, base_atom[:3])
 
         # Add the new H atom
-        new_atom_line = f"{x:.6f} {y:.6f} {z + 0.05:.6f} T   T   T\n"
+        new_atom_line = f"{x:.6f} {y:.6f} {z + 0.032:.6f} T   T   T\n"
         if not atom_coordinates[-1].endswith("\n"):
             atom_coordinates[-1] = atom_coordinates[-1] + "\n"
         atom_coordinates.append(new_atom_line)
