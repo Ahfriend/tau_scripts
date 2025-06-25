@@ -1,0 +1,8 @@
+[
+    {
+        "job_id": "4108622",
+        "status": "FAILED",
+        "timestamp": "2025-06-24T11:24:04.930681",
+        "error": "slurm_load_jobs error: Invalid job id specified"
+    }
+]
